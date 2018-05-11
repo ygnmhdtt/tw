@@ -61,8 +61,8 @@ func getTime() string {
 	return t.Format(f)
 }
 
-// usage returns usage string
-func usage() string {
+// Usage returns usage string
+func Usage() string {
 	return `Usage:
   tw				show your time line as stream
   tw "your_tweet_content"	post tweet
