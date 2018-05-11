@@ -1,4 +1,4 @@
-package main
+package tw
 
 import (
 	"fmt"
@@ -10,48 +10,34 @@ import (
 	"github.com/ChimeraCoder/anaconda"
 )
 
-// client is twitter client
-type client struct {
+// Client is twitter client
+type Client struct {
 	api    *anaconda.TwitterApi
 	logger *log.Logger
 }
 
-// newClient returns api client object
-func newClient() *client {
+// NewClient returns api client object
+func NewClient() *Client {
 	anaconda.SetConsumerKey(os.Getenv("TWITTER_CONSUMER_KEY"))
 	anaconda.SetConsumerSecret(os.Getenv("TWITTER_CONSUMER_SECRET"))
 	api := anaconda.NewTwitterApi(os.Getenv("TWITTER_ACCESS_TOKEN"), os.Getenv("TWITTER_ACCESS_TOKEN_SECRET"))
 	logger := log.New(os.Stdout, "logger: ", log.Lshortfile)
-	c := new(client)
+	c := new(Client)
 	c.api = api
 	c.logger = logger
 	return c
 }
 
-func main() {
-	c := newClient()
-	if 3 <= len(os.Args) {
-		fmt.Println(usage())
-		os.Exit(1)
-	}
-
-	if len(os.Args) == 1 {
-		c.stream()
-	} else {
-		c.tweet(os.Args[1])
-	}
-}
-
-// tweet tweets arg
-func (c *client) tweet(content string) {
+// Tweet tweets arg
+func (c *Client) Tweet(content string) {
 	_, err := c.api.PostTweet(os.Args[1], nil)
 	if err != nil {
 		panic(err)
 	}
 }
 
-// stream shows timeline
-func (c *client) stream() {
+// Stream shows timeline
+func (c *Client) Stream() {
 	c.logger.Println("Stream start")
 	v := url.Values{}
 	stream := c.api.UserStream(v)
@@ -61,7 +47,7 @@ func (c *client) stream() {
 		case item := <-stream.C:
 			switch status := item.(type) {
 			case anaconda.Tweet:
-				fmt.Printf("@%s (%s) at %s\n", status.User.Name, status.User.ScreenName, getTime())
+				fmt.Printf("@%s at %s\n", status.User.ScreenName, getTime())
 				fmt.Printf("%s\n", status.Text)
 				fmt.Printf("\n")
 			}
